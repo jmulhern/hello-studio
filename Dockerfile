@@ -8,10 +8,10 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies and build the application
-RUN npm install && npm run build
+RUN npm install && yarn install && yarn build
 
 # Expose the port the app will run on
-EXPOSE 3000
+EXPOSE 3333
 
 # Serve the app using a lightweight HTTP server
-CMD ["npx", "serve", "-s", "build", "-l", "3000"]
+CMD ["npm", "run", "start"]
