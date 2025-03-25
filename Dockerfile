@@ -1,17 +1,11 @@
-# Use the official Node.js image as the base
-FROM node:20
-
-# Set the working directory
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy the application code into the container
+COPY package*.json ./
+RUN npm install
 COPY . .
+RUN npm run build
 
-# Install dependencies and build the application
-RUN npm install && yarn install && yarn build
-
-# Expose the port the app will run on
-EXPOSE 3333
-
-# Serve the app using a lightweight HTTP server
-CMD ["npm", "run", "start"]
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
