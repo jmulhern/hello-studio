@@ -1,11 +1,19 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install && yarn install
+
+# Build the application
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Serve with a lightweight static server
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/dist /usr/share/static
+RUN npm install -g http-server
+
+EXPOSE 3000
+CMD ["http-server", "/usr/share/static", "-p", "3000"]
